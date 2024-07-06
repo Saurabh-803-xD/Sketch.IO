@@ -17,7 +17,7 @@ export default function Join() {
     return (
         <>
             <center className='join_main' >
-                <h1 style={{ fontSize: "70px" }}>DoodleQuest</h1>
+                <h1 style={{ fontSize: "70px" }}>Sketch IO</h1>
                 <h2 style={{ marginTop: "-60px" }} >"🤭", "🥴", "🥴", "🤩"</h2>
                 <br />
                 <h1 style={{ fontSize: "40px" }}>Join chat</h1>

@@ -4,6 +4,7 @@ import { useSearchParams } from "react-router-dom";
 import "./Main.css";
 import Chat from '../Chat/Chat';
 import Players from '../Players/Players';
+import backendLink from '../../backendLink';
 import Info from '../InfoBar/Info';
 import axios from 'axios';
 // import { toast } from 'react-toastify';
@@ -12,7 +13,7 @@ export default function Main() {
     const [searchParams] = useSearchParams();
     const room = searchParams.get('roomID');
     const name = searchParams.get("name");
-    const socket = useRef(io.connect("https://doodlequest-9.onrender.com/"));
+    const socket = useRef(io.connect(`${backendLink}`));
     const canvasRef = useRef(null);
     const contextRef = useRef(null);
     const [isDrawing, setIsDrawing] = useState(false);
@@ -29,7 +30,7 @@ export default function Main() {
 
 
     useEffect(() => {
-        socket.current = io.connect("https://doodlequest-9.onrender.com/");
+        socket.current = io.connect(`${backendLink}`);
         socket.current.emit("join-room", { room, name });
 
         socket.current.on("draw", ({ offsetX, offsetY, color }) => {
@@ -60,7 +61,7 @@ export default function Main() {
     useEffect(() => {
         const socketInstance = socket.current;
         const handleNewPlayer = async (player) => {
-            let response = await axios.get("https://doodlequest-9.onrender.com/userList");
+            let response = await axios.get(`${backendLink}/userList`);
             setplayers(response.data)
         }
         socketInstance.on("newPlayer", handleNewPlayer)

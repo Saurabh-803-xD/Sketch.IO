@@ -4,6 +4,7 @@ import axios from 'axios';
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import backendLink from '../../backendLink';
 
 export default function Info(props) {
   const { socket, player, name, setplayer } = props;
@@ -36,7 +37,7 @@ export default function Info(props) {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        let response = await axios.get("https://doodlequest-9.onrender.com/userList");
+        let response = await axios.get(`${backendLink}/userList`);
         setPlayers(response.data);
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -163,7 +164,7 @@ export default function Info(props) {
     const socket = newSocket.current;
 
     const handleNewPlayer = async (player) => {
-      let response = await axios.get("https://doodlequest-9.onrender.com/userList");
+      let response = await axios.get(`${backendLink}userList`);
       setplayer(response.data)
     }
 

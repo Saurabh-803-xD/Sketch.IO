@@ -1,10 +1,10 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import "./Chat.css";
 
 export default function Chat(props) {
   const { name, room, socket } = props;
   const [message, setMessage] = useState("");
-  const newSocket = useRef(socket);
+  // const newSocket = useRef(socket);
   const [allMessages, setAllMessages] = useState([]);
 
   const sendMessage = async () => {
@@ -16,11 +16,11 @@ export default function Chat(props) {
       time: new Date(Date.now()).getHours() + ":" + new Date(Date.now()).getMinutes(),
     };
 
-    newSocket.current.emit("sendMessage", messageData);
+    socket.emit("sendMessage", messageData);
   };
 
   useEffect(() => {
-    const socket = newSocket.current;
+    // const socket = newSocket.current;
     const handleMessages = ({ name, message }) => {
       setAllMessages((currentMessages) => [...currentMessages, { name, message }]);
     };
@@ -31,7 +31,7 @@ export default function Chat(props) {
     return () => {
       socket.off("receiveMessage", handleMessages);
     };
-  }, []);
+  }, [socket]);
 
   return (
     <main className='chat_main'>
