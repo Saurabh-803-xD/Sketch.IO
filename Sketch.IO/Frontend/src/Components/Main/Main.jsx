@@ -19,8 +19,8 @@ export default function Main() {
     const [isDrawing, setIsDrawing] = useState(false);
     const [color, setColor] = useState('#000000');
     const [players, setplayers] = useState([])
-
     
+
     const handleOnoad = async(event) => {
         await socket.current.emit("disconnectUser", { name, room });
         window.location.href = "/";
@@ -61,7 +61,7 @@ export default function Main() {
     useEffect(() => {
         const socketInstance = socket.current;
         const handleNewPlayer = async (player) => {
-            let response = await axios.get(`${backendLink}/userList`);
+            let response = await axios.get(`${backendLink}userList`);
             setplayers(response.data)
         }
         socketInstance.on("newPlayer", handleNewPlayer)
@@ -69,7 +69,6 @@ export default function Main() {
             socketInstance.off("newPlayer", handleNewPlayer);
         }
     }, []);
-
 
     useEffect(() => {
         const canvas = canvasRef.current;

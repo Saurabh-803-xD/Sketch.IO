@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import './Info.css';
 import axios from 'axios';
-
+import WinnerModal from '../WinnerModal/WinnerModal';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import backendLink from '../../backendLink';
@@ -9,6 +9,21 @@ import backendLink from '../../backendLink';
 export default function Info(props) {
   const { socket, player, name, setplayer } = props;
   const newSocket = useRef(socket.current);
+  useEffect(() => {
+    const handleBeforeUnload = async () => {
+      try {
+        await axios.post(`${backendLink}removeUser`, { userName: name });
+      } catch (error) {
+        console.error("Error removing user from the database:", error);
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [name]);
 
   const [answer, setAnswer] = useState("");
   const [item, setItem] = useState("");
@@ -24,6 +39,8 @@ export default function Info(props) {
   const whoDrawingNow = useRef(null);
 
   const [userWithGuess, setUserWithGuess] = useState("");
+  const [winner, setWinner] = useState(null);
+  const [showWinnerModal, setShowWinnerModal] = useState(false);
 
   const wordArray = [
     { 1: "mango", 2: "banana", 3: "cherry" },
@@ -33,11 +50,10 @@ export default function Info(props) {
     { 1: "tree", 2: "notebook", 3: "ocean" }
   ];
 
-
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        let response = await axios.get(`${backendLink}/userList`);
+        let response = await axios.get(`${backendLink}userList`);
         setPlayers(response.data);
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -46,9 +62,7 @@ export default function Info(props) {
     fetchUsers();
   }, [player, name]);
 
-
   // Timers
-
   useEffect(() => {
     let timer;
     if (countdown > 0) {
@@ -65,9 +79,6 @@ export default function Info(props) {
     return () => clearTimeout(timer);
   }, [drawTime]);
 
-
-
-
   async function chooseWordWait() {
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -76,18 +87,14 @@ export default function Info(props) {
     });
   }
 
-
-
   useEffect(() => {
     const handleAcknowledgement = async (index) => {
       const currentPlayer = players[index];
-
       setrandom(Math.floor(Math.random() * 5));
 
       if (currentPlayer.userName === name) {
         setCountdown(5);
         setDrawTime(25);
-
         whoDrawingNow.current.style.display = "none";
         questions.current.style.display = "flex";
         await chooseWordWait(); // Wait for 25 seconds
@@ -102,7 +109,6 @@ export default function Info(props) {
     };
 
     const socket = newSocket.current;
-    
     const dummy = async () => {
       socket.on('acknowledgement', handleAcknowledgement);
     };
@@ -123,93 +129,96 @@ export default function Info(props) {
       if (currentIteration < loopCount - 1) {
         currentIteration++;
         await newSocket.current.emit('myEvent', currentIteration);
-      }
-      else {
+      } else {
         clearInterval(interval);
+        determineWinner();
       }
     }, 25000);
   };
-
-
 
   const handleEnter = async (e) => {
     setUserWithGuess(name);
     if (e.key === 'Enter') {
       if (item === answer) {
         toast("Right Answer, points updated")
-        newSocket.current.emit("updatePlayerPoints", { name, drawTime })
-      }
-      else {
-        toast("Wrong Guess")
+        newSocket.current.emit("updatePlayerPoints", { name, drawTime });
+      } else {
+        toast("Wrong Guess");
       }
     }
   };
 
-
   useEffect(() => {
-
     const socket = newSocket.current;
     const handleGuesstingWord = async (info) => {
       setItem(info[0]);
-    }
+    };
     socket.on("wordToGuess", handleGuesstingWord);
     return () => {
       socket.off("wordToGuess", handleGuesstingWord);
-    }
-  }, [item])
-
+    };
+  }, [item]);
 
   useEffect(() => {
-
     const socket = newSocket.current;
-
     const handleNewPlayer = async (player) => {
       let response = await axios.get(`${backendLink}userList`);
-      setplayer(response.data)
-    }
+      setplayer(response.data);
+    };
 
     socket.on('updatePlayerPoints', handleNewPlayer);
-
     return () => {
       socket.off('updatePlayerPoints', handleNewPlayer);
     };
   }, [userWithGuess, setplayer]);
 
+  // Emit winner info to all clients and show winner modal
+  const determineWinner = () => {
+    const highestScorer = players.reduce((prev, current) => {
+      return prev.score > current.score ? prev : current;
+    });
+
+    setWinner(highestScorer);
+    setShowWinnerModal(true);
+
+    // Emit the winner to all connected clients
+    newSocket.current.emit('gameOver', highestScorer);
+  };
+
+  useEffect(() => {
+    const socket = newSocket.current;
+
+    const handleGameOver = (winner) => {
+      setWinner(winner);
+      setShowWinnerModal(true);
+    };
+
+    socket.on('gameOver', handleGameOver);
+
+    return () => {
+      socket.off('gameOver', handleGameOver);
+    };
+  }, []);
 
   return (
     <>
       <center className='main_Info' style={{ marginTop: "-13px" }}>
-
         <ToastContainer />
-
         <small ref={whoDrawingNow} className='whoDrawing'>{playerDrawing} is drawing...</small>
-
         <main className='info_Main'>
-
           <section className="time">
             {drawTime}
           </section>
-
           <section>
-
             <input onChange={(e) => setAnswer(e.target.value)} type="text" onKeyDown={handleEnter} placeholder='Enter your answer here' />
-
           </section>
-
           <section className='start'><button onClick={StartGame}>Start</button></section>
-
         </main>
-
         <section ref={questions} className="askQuestions" style={{ display: 'none' }}>
-
           <center>
-
             <h4>Select the word</h4>
-
             <small className="choosingTime">{countdown}</small>
-
             <span className="select">
-
               <div onClick={async () => {
                 await newSocket.current.emit("wordToGuess", [wordArray[random]["1"]]);
                 setItem(wordArray[random]["1"]);
@@ -217,7 +226,6 @@ export default function Info(props) {
               }}>
                 {wordArray[random]["1"]}
               </div>
-
               <div onClick={async () => {
                 await newSocket.current.emit("wordToGuess", [wordArray[random]["2"]]);
                 setItem(wordArray[random]["2"]);
@@ -225,7 +233,6 @@ export default function Info(props) {
               }}>
                 {wordArray[random]["2"]}
               </div>
-
               <div onClick={async () => {
                 await newSocket.current.emit("wordToGuess", [wordArray[random]["3"]]);
                 setItem(wordArray[random]["3"]);
@@ -233,15 +240,11 @@ export default function Info(props) {
               }}>
                 {wordArray[random]["3"]}
               </div>
-
-
             </span>
-
           </center>
-
         </section>
-
       </center>
+      <WinnerModal show={showWinnerModal} winner={winner} onClose={() => setShowWinnerModal(false)} />
     </>
   );
 }

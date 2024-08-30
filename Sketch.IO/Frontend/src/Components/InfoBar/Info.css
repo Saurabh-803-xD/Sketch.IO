@@ -15,7 +15,6 @@
     padding: 5px;
 }
 
-
 .askQuestions{
     position: fixed;
     top: 10px;
@@ -88,4 +87,8 @@
 }
 body, body button, body input{
     font-size: 18px;
+}
+.start button{
+    margin: .5rem;
+    cursor: pointer;
 }
