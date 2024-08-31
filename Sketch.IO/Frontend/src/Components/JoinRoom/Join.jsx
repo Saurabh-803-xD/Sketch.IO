@@ -5,13 +5,13 @@ import { Link } from "react-router-dom";
 export default function Join() {
     const [userName, setuserName] = useState("")
     // const [room, setroom] = useState("");
-    const room =1;
     const handleJoinRoom = () => {
         if (userName === "") {
             window.alert("Please fill all fields");
             return;
         }
     }
+    const room =1;
     useEffect(() => {
         localStorage.removeItem("userPresent");
     }, [])
@@ -24,6 +24,7 @@ export default function Join() {
                 <br />
                 <br />
                 {/* <input onChange={(event) => setroom(event.target.value)} type="text" placeholder='Join a room' style={{textAlign:"center"}}/> */}
+                <input type="text" placeholder='Join a room' style={{textAlign:"center"}}/> 
                 <br />
                 <br />
                 <button onClick={handleJoinRoom} >

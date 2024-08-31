@@ -135,6 +135,12 @@ export default function Main() {
                     <Info setplayer={setplayers} player={players} name={name} room={room} socket={socket} />
                 </section>
 
+                {/* New Section to Display User Name */}
+                <section className='userName'>
+                    <p>Welcome, <strong>{name} 😎</strong>!</p>
+                </section>
+
+
                 <section className='align'>
                     <section className="players">
                         <Players name={name} room={room} socket={socket.current} playerList={players} />

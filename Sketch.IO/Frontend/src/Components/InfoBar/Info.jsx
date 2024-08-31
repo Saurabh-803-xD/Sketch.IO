@@ -9,6 +9,7 @@ import backendLink from '../../backendLink';
 export default function Info(props) {
   const { socket, player, name, setplayer } = props;
   const newSocket = useRef(socket.current);
+
   useEffect(() => {
     const handleBeforeUnload = async () => {
       try {
@@ -47,6 +48,19 @@ export default function Info(props) {
     { 1: "lamp", 2: "elephant", 3: "fox" },
     { 1: "guitar", 2: "harp", 3: "instrument" },
     { 1: "kite", 2: "valley", 3: "lamp" },
+    { 1: "cat", 2: "dog", 3: "rabbit" },
+    { 1: "car", 2: "bicycle", 3: "train" },
+    { 1: "book", 2: "pen", 3: "paper" },
+    { 1: "computer", 2: "keyboard", 3: "mouse" },
+    { 1: "flower", 2: "tree", 3: "grass" },
+    { 1: "house", 2: "apartment", 3: "cabin" },
+    { 1: "apple", 2: "orange", 3: "grape" },
+    { 1: "ship", 2: "boat", 3: "submarine" },
+    { 1: "pencil", 2: "eraser", 3: "ruler" },
+    { 1: "airplane", 2: "helicopter", 3: "drone" },
+    { 1: "shirt", 2: "pants", 3: "hat" },
+    { 1: "camera", 2: "lens", 3: "tripod" },
+    { 1: "guitar", 2: "piano", 3: "drum" },
     { 1: "tree", 2: "notebook", 3: "ocean" }
   ];
 
@@ -83,7 +97,7 @@ export default function Info(props) {
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve();
-      }, 25000);
+      }, 20000);
     });
   }
 
