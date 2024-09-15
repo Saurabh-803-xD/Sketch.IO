@@ -24,7 +24,7 @@ export default function Join() {
                 <br />
                 <br />
                 {/* <input onChange={(event) => setroom(event.target.value)} type="text" placeholder='Join a room' style={{textAlign:"center"}}/> */}
-                <input type="text" placeholder='Join a room' style={{textAlign:"center"}}/> 
+                {/* <input type="text" placeholder='Join a room' style={{textAlign:"center"}}/>  */}
                 <br />
                 <br />
                 <button onClick={handleJoinRoom} >

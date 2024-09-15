@@ -156,6 +156,8 @@ export default function Info(props) {
       if (item === answer) {
         toast("Right Answer, points updated")
         newSocket.current.emit("updatePlayerPoints", { name, drawTime });
+        setAnswer(""); // Reset the input field
+
       } else {
         toast("Wrong Guess");
       }
@@ -218,7 +220,11 @@ export default function Info(props) {
     <>
       <center className='main_Info' style={{ marginTop: "-13px" }}>
         <ToastContainer />
-        <small ref={whoDrawingNow} className='whoDrawing'>{playerDrawing} is drawing...</small>
+        {/* <small ref={whoDrawingNow} className='whoDrawing'>{playerDrawing} is drawing...</small> */}
+        {!winner && (
+          <small ref={whoDrawingNow} className='whoDrawing'>{playerDrawing} is drawing...</small>
+        )}
+
         <main className='info_Main'>
           <section className="time">
             {drawTime}
